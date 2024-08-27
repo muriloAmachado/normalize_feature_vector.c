@@ -1,0 +1,42 @@
+// Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "(gdb) Launch",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/main.out",  // Caminho para o executável gerado
+                "args": [],  // Argumentos de linha de comando (se necessário)
+                "stopAtEntry": false,  // Se true, o depurador para na entrada do programa
+                "cwd": "${workspaceFolder}",  // Diretório de trabalho atual
+                "environment": [],
+                "externalConsole": false,  // Se true, usa um console externo
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Habilitar formatação pretty-print para gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ],
+                "preLaunchTask": "C/C++: gcc build active file",  // Tarefa de compilação a ser executada antes da depuração
+                "miDebuggerPath": "/usr/bin/gdb",  // Caminho para o GDB
+                "logging": {
+                    "trace": true,  // Habilitar logs de trace para o depurador
+                    "traceResponse": true,  // Habilitar logs de resposta do depurador
+                    "engineLogging": false,  // Habilitar logs do motor de depuração
+                    "programOutput": true,  // Exibir a saída do programa
+                    "exceptions": true  // Exibir exceções
+                },
+                "launchCompleteCommand": "exec-run",  // Comando para executar após o início do depurador
+                "sourceFileMap": {
+                    "/mnt/c": "c:/mnt/c"
+                }
+            }
+        ]
+    }
+        
+    
