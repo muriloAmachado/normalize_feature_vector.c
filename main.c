@@ -30,12 +30,19 @@ float** read_csv(const char* filename, int* num_elements, int* num_dimensions) {
     }
 
     // Determine the number of elements and dimensions
+    // Essa parte do código serve apenas para definir a quantidade de linhas e colunas do arquivo CSV
+    // token = index da primeira linha
+    // line = conteúdo das linhas
+    // strtok = função para ler a linha até determinado ponto -> strtok(até onde ele segue, caracter de referência para ler até o primeiro parâmetro informado) 
     *num_elements = 0;
     *num_dimensions = 0;
     char line[1024];
     while (fgets(line, sizeof(line), file)) {
         if (*num_elements == 0) {
             char* token = strtok(line, ",");
+            
+            printf("%c\n", *token);
+            
             while (token) {
                 (*num_dimensions)++;
                 token = strtok(NULL, ",");
@@ -56,7 +63,10 @@ float** read_csv(const char* filename, int* num_elements, int* num_dimensions) {
     while (fgets(line, sizeof(line), file)) {
         int j = 0;
         char* token = strtok(line, ",");
+        
+        printf("%c\n", *token);
         while (token) {
+            //
             features[i][j++] = atof(token);
             token = strtok(NULL, ",");
         }
