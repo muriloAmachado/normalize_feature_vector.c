@@ -8,17 +8,64 @@
 #define _GNU_SOURCE
 //#endif
 
+float Q_rsqrt(float number) {
+    long i;
+    float x2, y;
+    const float threehalfs = 1.5F;
+
+    x2 = number * 0.5F;
+    y  = number;
+    i  = *(long *) &y;                       // Interpreta o float como inteiro
+    i  = 0x5f3759df - (i >> 1);                 // Primeiro passo da mágica
+    y  = *(float *) &i;                         // Converte de volta para float
+    y  = y * (threehalfs - (x2 * y * y));       // Um passo de Newton para refinamento
+
+    return y;
+}
+
 // Função naïve para normalizar um vetor de características
 void normalize_feature_vector(float* features, int length) {
     float sum = 0.0f;
     for (int i = 0; i < length; i++) {
         sum += features[i] * features[i];
     }
-    float inv_sqrt = 1.0f / sqrt(sum);
+    float inv_sqrt = Q_rsqrt(sum);
 
     for (int i = 0; i < length; i++) {
         features[i] *= inv_sqrt;
     }
+}
+
+float gerar_valor_aleatorio(float min, float max) {
+    return min + (float)rand() / (float)(RAND_MAX / (max - min));
+}
+
+void escrever_csv(FILE *arquivo){
+
+    int QNTD_VETORES = 1000;
+    int TAMANHO_VETOR = 100;
+
+    arquivo = fopen("data.csv", "w");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo!\n");
+    }
+
+    srand(time_t(0));
+
+    // Gerar e escrever os vetores no arquivo CSV
+    for (int i = 0; i < QNTD_VETORES; i++) {
+        for (int j = 0; j < TAMANHO_VETOR; j++) {
+            float valor = gerar_valor_aleatorio(0.1f, 10.0f);  // Valores entre 0.1 e 10.0
+            fprintf(arquivo, "%.4f", valor);  // Escreve com 4 casas decimais
+            if (j < TAMANHO_VETOR - 1) {
+                fprintf(arquivo, ",");
+            }
+        }
+        fprintf(arquivo, "\n");
+    }
+
+    // Fechar o arquivo
+    fclose(arquivo);
 }
 
 // Função para ler dados de um arquivo CSV
@@ -33,16 +80,13 @@ float** read_csv(const char* filename, int* num_elements, int* num_dimensions) {
     // Essa parte do código serve apenas para definir a quantidade de linhas e colunas do arquivo CSV
     // token = index da primeira linha
     // line = conteúdo das linhas
-    // strtok = função para ler a linha até determinado ponto -> strtok(até onde ele segue, caracter de referência para ler até o primeiro parâmetro informado) 
+    // strtok = função para ler a linha até determinado ponto -> strtok(até onde ele segue, caracter de referência para ler até o primeiro parâmetro informado)
     *num_elements = 0;
     *num_dimensions = 0;
     char line[1024];
     while (fgets(line, sizeof(line), file)) {
         if (*num_elements == 0) {
             char* token = strtok(line, ",");
-            
-            printf("%c\n", *token);
-            
             while (token) {
                 (*num_dimensions)++;
                 token = strtok(NULL, ",");
@@ -63,10 +107,7 @@ float** read_csv(const char* filename, int* num_elements, int* num_dimensions) {
     while (fgets(line, sizeof(line), file)) {
         int j = 0;
         char* token = strtok(line, ",");
-        
-        printf("%c\n", *token);
         while (token) {
-            //
             features[i][j++] = atof(token);
             token = strtok(NULL, ",");
         }
@@ -90,6 +131,16 @@ void print_resource_usage(const char* label, struct rusage* usage) {
 }
 
 int main() {
+
+    FILE *arquivo;
+    arquivo = fopen("data.csv", "w");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo!\n");
+        return 1;
+    }
+
+    escrever_csv(arquivo);
+
     int num_elements, num_dimensions;
     float** features = read_csv("data.csv", &num_elements, &num_dimensions);
 
