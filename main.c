@@ -15,10 +15,10 @@ float Q_rsqrt(float number) {
 
     x2 = number * 0.5F;
     y  = number;
-    i  = *(long *) &y;                       // Interpreta o float como inteiro
-    i  = 0x5f3759df - (i >> 1);                 // Primeiro passo da mágica
-    y  = *(float *) &i;                         // Converte de volta para float
-    y  = y * (threehalfs - (x2 * y * y));       // Um passo de Newton para refinamento
+    i  = *(long *) &y;                          
+    i  = 0x5f3759df - (i >> 1);                 
+    y  = *(float *) &i;                         
+    y  = y * (threehalfs - (x2 * y * y));      
 
     return y;
 }
