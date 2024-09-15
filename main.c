@@ -67,8 +67,6 @@ void escrever_csv(FILE *arquivo){
         }
         fprintf(arquivo, "\n");
     }
-
-    // Fechar o arquivo
     fclose(arquivo);
 }
 
