@@ -36,10 +36,14 @@ void normalize_feature_vector(float* features, int length) {
     }
 }
 
+//Função para gerar valores flotas aleatórios para gravar no arquivo csv 
 float gerar_valor_aleatorio(float min, float max) {
     return min + (float)rand() / (float)(RAND_MAX / (max - min));
 }
 
+//Gravar valores aleatórios no arquivos csv 
+// QTND_VETORES = quantidade de linhas que serão gravadas
+//TAMANHO_VETOR = quantidade de colunas que serão geradas
 void escrever_csv(FILE *arquivo){
 
     int QNTD_VETORES = 1000;
