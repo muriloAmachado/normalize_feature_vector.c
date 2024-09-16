@@ -3,33 +3,25 @@
 #include <math.h>
 #include <stdlib.h>
 #include <sys/resource.h>
+#include <xmmintrin.h>
 
 //#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 //#endif
 
-float Q_rsqrt(float number) {
-    long i;
-    float x2, y;
-    const float threehalfs = 1.5F;
-
-    x2 = number * 0.5F;
-    y  = number;
-    i  = *(long *) &y;                          
-    i  = 0x5f3759df - (i >> 1);                 
-    y  = *(float *) &i;                         
-    y  = y * (threehalfs - (x2 * y * y));      
-
-    return y;
-}
-
 // Função naïve para normalizar um vetor de características
 void normalize_feature_vector(float* features, int length) {
     float sum = 0.0f;
+    
     for (int i = 0; i < length; i++) {
         sum += features[i] * features[i];
     }
-    float inv_sqrt = Q_rsqrt(sum);
+
+    __m128 vec = _mm_load_ss(&sum);
+    __m128 inv_sqrt_vec = _mm_rsqrt_ss(vec);
+
+    float inv_sqrt;
+    _mm_store_ss(&inv_sqrt, inv_sqrt_vec);
 
     for (int i = 0; i < length; i++) {
         features[i] *= inv_sqrt;
