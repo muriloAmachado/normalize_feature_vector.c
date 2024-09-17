@@ -157,9 +157,9 @@ int main() {
     printf("Normalized features:\n");
     for (int i = 0; i < num_elements; i++) {
         for (int j = 0; j < num_dimensions; j++) {
-            //printf("%f ", features[i][j]);
+            printf("%f ", features[i][j]);
         }
-        //printf("\n");
+        printf("\n");
     }
 
     printf("Execution time and resource usage:\n");
