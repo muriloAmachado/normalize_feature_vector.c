@@ -3,10 +3,34 @@
 #include <math.h>
 #include <stdlib.h>
 #include <sys/resource.h>
+#include <time.h>
 
 //#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 //#endif
+
+// Array definition
+int QNTD_VETORES = 1000;
+int ARRAY_SIZE = 1000;
+
+// Max sum and Lookup maximum size
+#define MAX_SUM (ARRAY_SIZE * 100 * 100)
+#define LOOKUP_TABLE_SIZE (MAX_SUM + 1)
+
+// Lookup signature
+float* lookup_results;
+
+// Lookup initialization
+void lookup_init(int max_sum) {
+    lookup_results = (float*)malloc((max_sum + 1) * sizeof(float));
+    if (lookup_results == NULL) {
+        fprintf(stderr, "Malloc error in lookup_init\n");
+        exit(EXIT_FAILURE);
+    }
+    for (int i = 1; i <= max_sum; i++) {
+        lookup_results[i] = 1.0f / sqrt((float)i);
+    }
+}
 
 // Função naïve para normalizar um vetor de características
 void normalize_feature_vector(float* features, int length) {
@@ -14,11 +38,48 @@ void normalize_feature_vector(float* features, int length) {
     for (int i = 0; i < length; i++) {
         sum += features[i] * features[i];
     }
-    float inv_sqrt = 1.0f / sqrt(sum);
+    
+    // Securing that the sum doesn't overflow
+    if (sum > MAX_SUM) {
+        sum = MAX_SUM;
+    }
+
+    // Consulting lookup table
+    float inv_sqrt = lookup_results[(int)sum];
 
     for (int i = 0; i < length; i++) {
         features[i] *= inv_sqrt;
     }
+}
+
+//Função para gerar valores flotas aleatórios para gravar no arquivo csv 
+float gerar_valor_aleatorio(float min, float max) {
+    return min + (float)rand() / (float)(RAND_MAX / (max - min));
+}
+
+//Gravar valores aleatórios no arquivos csv 
+// QTND_VETORES = quantidade de linhas que serão gravadas
+//TAMANHO_VETOR = quantidade de colunas que serão geradas
+void write_csv(){
+    FILE *arquivo = fopen("data.csv", "w");
+    if (arquivo == NULL) {
+        printf("File opening error!\n");
+    }
+
+    srand(time(NULL));
+
+    // Generating and writing arrays in CSV
+    for (int i = 0; i < QNTD_VETORES; i++) {
+        for (int j = 0; j < ARRAY_SIZE; j++) {
+            float valor = gerar_valor_aleatorio(0.1f, 10.0f);  // Valores entre 0.1 e 10.0
+            fprintf(arquivo, "%.4f", valor);  // Escreve com 4 casas decimais
+            if (j < ARRAY_SIZE - 1) {
+                fprintf(arquivo, ",");
+            }
+        }
+        fprintf(arquivo, "\n");
+    }
+    fclose(arquivo);
 }
 
 // Função para ler dados de um arquivo CSV
@@ -33,16 +94,13 @@ float** read_csv(const char* filename, int* num_elements, int* num_dimensions) {
     // Essa parte do código serve apenas para definir a quantidade de linhas e colunas do arquivo CSV
     // token = index da primeira linha
     // line = conteúdo das linhas
-    // strtok = função para ler a linha até determinado ponto -> strtok(até onde ele segue, caracter de referência para ler até o primeiro parâmetro informado) 
+    // strtok = função para ler a linha até determinado ponto -> strtok(até onde ele segue, caracter de referência para ler até o primeiro parâmetro informado)
     *num_elements = 0;
     *num_dimensions = 0;
     char line[1024];
     while (fgets(line, sizeof(line), file)) {
         if (*num_elements == 0) {
             char* token = strtok(line, ",");
-            
-            printf("%c\n", *token);
-            
             while (token) {
                 (*num_dimensions)++;
                 token = strtok(NULL, ",");
@@ -54,6 +112,10 @@ float** read_csv(const char* filename, int* num_elements, int* num_dimensions) {
 
     // Allocate memory for the features
     float** features = (float**)malloc(*num_elements * sizeof(float*));
+    if (features == NULL) {
+        fprintf(stderr, "Malloc error in features\n");
+        exit(EXIT_FAILURE);
+    }   
     for (int i = 0; i < *num_elements; i++) {
         features[i] = (float*)malloc(*num_dimensions * sizeof(float));
     }
@@ -63,10 +125,7 @@ float** read_csv(const char* filename, int* num_elements, int* num_dimensions) {
     while (fgets(line, sizeof(line), file)) {
         int j = 0;
         char* token = strtok(line, ",");
-        
-        printf("%c\n", *token);
         while (token) {
-            //
             features[i][j++] = atof(token);
             token = strtok(NULL, ",");
         }
@@ -90,6 +149,9 @@ void print_resource_usage(const char* label, struct rusage* usage) {
 }
 
 int main() {
+    lookup_init(MAX_SUM);
+    write_csv();
+
     int num_elements, num_dimensions;
     float** features = read_csv("data.csv", &num_elements, &num_dimensions);
 
@@ -117,8 +179,15 @@ int main() {
     for (int i = 0; i < num_elements; i++) {
         free(features[i]);
     }
-    free(features);
+    if (features != NULL) {
+        for (int i = 0; i < num_elements; i++) {
+            free(features[i]);
+        }
+        free(features);
+    }
+    if (lookup_results != NULL) {
+        free(lookup_results);
+    }
 
     return 0;
 }
-
