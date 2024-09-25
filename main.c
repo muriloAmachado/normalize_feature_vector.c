@@ -3,11 +3,16 @@
 #include <math.h>
 #include <stdlib.h>
 #include <sys/resource.h>
+#include <time.h>
 #include <xmmintrin.h>
 
 //#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 //#endif
+
+// Array definition
+int LINES = 1000;
+int ARRAY_SIZE = 1000;
 
 // Função naïve para normalizar um vetor de características
 void normalize_feature_vector(float* features, int length) {
@@ -33,27 +38,20 @@ float gerar_valor_aleatorio(float min, float max) {
     return min + (float)rand() / (float)(RAND_MAX / (max - min));
 }
 
-//Gravar valores aleatórios no arquivos csv 
-// QTND_VETORES = quantidade de linhas que serão gravadas
-//TAMANHO_VETOR = quantidade de colunas que serão geradas
-void escrever_csv(FILE *arquivo){
-
-    int QNTD_VETORES = 1000;
-    int TAMANHO_VETOR = 100;
-
-    arquivo = fopen("data.csv", "w");
+void write_csv(){
+    FILE *arquivo = fopen("data.csv", "w");
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo!\n");
+        printf("File opening error!\n");
     }
 
-    srand(time_t(0));
+    srand(time(NULL));
 
-    // Gerar e escrever os vetores no arquivo CSV
-    for (int i = 0; i < QNTD_VETORES; i++) {
-        for (int j = 0; j < TAMANHO_VETOR; j++) {
+    // Generating and writing arrays in CSV
+    for (int i = 0; i < LINES; i++) {
+        for (int j = 0; j < ARRAY_SIZE; j++) {
             float valor = gerar_valor_aleatorio(0.1f, 10.0f);  // Valores entre 0.1 e 10.0
             fprintf(arquivo, "%.4f", valor);  // Escreve com 4 casas decimais
-            if (j < TAMANHO_VETOR - 1) {
+            if (j < ARRAY_SIZE - 1) {
                 fprintf(arquivo, ",");
             }
         }
@@ -126,14 +124,7 @@ void print_resource_usage(const char* label, struct rusage* usage) {
 
 int main() {
 
-    FILE *arquivo;
-    arquivo = fopen("data.csv", "w");
-    if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo!\n");
-        return 1;
-    }
-
-    escrever_csv(arquivo);
+    write_csv();
 
     int num_elements, num_dimensions;
     float** features = read_csv("data.csv", &num_elements, &num_dimensions);
