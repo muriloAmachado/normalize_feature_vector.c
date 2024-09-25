@@ -10,7 +10,7 @@
 //#endif
 
 // Array definition
-int QNTD_VETORES = 1000;
+int LINES = 1000;
 int ARRAY_SIZE = 1000;
 
 // Max sum and Lookup maximum size
@@ -69,7 +69,7 @@ void write_csv(){
     srand(time(NULL));
 
     // Generating and writing arrays in CSV
-    for (int i = 0; i < QNTD_VETORES; i++) {
+    for (int i = 0; i < LINES; i++) {
         for (int j = 0; j < ARRAY_SIZE; j++) {
             float valor = gerar_valor_aleatorio(0.1f, 10.0f);  // Valores entre 0.1 e 10.0
             fprintf(arquivo, "%.4f", valor);  // Escreve com 4 casas decimais
