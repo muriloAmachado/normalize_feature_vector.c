@@ -14,7 +14,7 @@
 int LINES = 1000;
 int ARRAY_SIZE = 1000;
 
-// Função naïve para normalizar um vetor de características
+// Naive function to normalize a feature vector
 void normalize_feature_vector(float* features, int length) {
     float sum = 0.0f;
     
@@ -33,8 +33,8 @@ void normalize_feature_vector(float* features, int length) {
     }
 }
 
-//Função para gerar valores flotas aleatórios para gravar no arquivo csv 
-float gerar_valor_aleatorio(float min, float max) {
+// Function to generate random float values to write to a CSV file
+float generate_random_value(float min, float max) {
     return min + (float)rand() / (float)(RAND_MAX / (max - min));
 }
 
@@ -60,7 +60,7 @@ void write_csv(){
     fclose(arquivo);
 }
 
-// Função para ler dados de um arquivo CSV
+// Function to read data from a CSV file
 float** read_csv(const char* filename, int* num_elements, int* num_dimensions) {
     FILE* file = fopen(filename, "r");
     if (!file) {
@@ -69,10 +69,10 @@ float** read_csv(const char* filename, int* num_elements, int* num_dimensions) {
     }
 
     // Determine the number of elements and dimensions
-    // Essa parte do código serve apenas para definir a quantidade de linhas e colunas do arquivo CSV
-    // token = index da primeira linha
-    // line = conteúdo das linhas
-    // strtok = função para ler a linha até determinado ponto -> strtok(até onde ele segue, caracter de referência para ler até o primeiro parâmetro informado)
+    // This part of the code is only to define the number of rows and columns in the CSV file
+    // token = index of the first line
+    // line = content of the lines
+    // strtok = function to read the line up to a certain point -> strtok(up to where it follows, reference character to read up to the first parameter informed)
     *num_elements = 0;
     *num_dimensions = 0;
     char line[1024];
@@ -110,7 +110,7 @@ float** read_csv(const char* filename, int* num_elements, int* num_dimensions) {
     return features;
 }
 
-// Função para medir o tempo de execução usando a biblioteca 'resources'
+// Function to measure execution time using the 'resources' library
 void get_resource_usage(struct rusage* usage) {
     getrusage(RUSAGE_SELF, usage);
 }
